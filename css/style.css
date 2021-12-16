@@ -20,6 +20,17 @@ h1{
 }
 form{
   width: 40%;
+  background-color: white;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 3px 3px 7px black;
+  border-radius: 5px;
+}
+.divWrapper{
+  width: 40%;
   background: white;
   height: 50vh;
   display: flex;

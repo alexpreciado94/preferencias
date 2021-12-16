@@ -1,4 +1,5 @@
 <?php
+//CERRAR CONEXIONES BD
   class Procesos{
     function __construct(){
       include_once 'conexion.php';
@@ -18,6 +19,22 @@
       session_start();
       $_SESSION['idUsuario'] = $this->recuperarId($datosRegistro)['idUsuario'];
       header('Location: vistas/preferencias.php');
+    }
+    function inicioSesion($datosInicio){
+      $sql = "select idUsuario, correo, password from usuario";
+      $resultado = $this->conexion->consultar($sql);
+      $sw = false;
+      while($fila = $this->conexion->extraerFila($resultado)){
+        if($fila['correo']==$datosInicio['email'] && $fila['password']==$datosInicio['password']){
+          session_start();
+          $_SESSION['idUsuario'] = $fila['idUsuario'];
+          $sw = true;
+          header('Location: mostrarPreferencias.php');
+        }
+      }
+      if(!$sw){
+        $this->error(1);
+      }
     }
     function listar(){
       $sql = 'select nombreJuego, idJuego from juego';
@@ -40,10 +57,22 @@
       }
       header('Location: ../index.php');
     }
+    function mostrarPreferencias(){
+      $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
+      where preferencia.idUsuario ='.$_SESSION['idUsuario'];
+      $resultado = $this->conexion->consultar($sql);
+      for ($i=0; $i<$resultado->num_rows; $i++){
+        $fila = $this->conexion->extraerFila($resultado);
+        echo '<p>'.$fila['nombreJuego'].'</p>';
+      }
+    }
     function error($errno){
       switch ($errno) {
         case 0:
           echo 'El correo no pertenece a la Fundación';
+          break;
+        case 1:
+          echo 'El correo o la contraseña son incorrectos';
           break;
         case 1062:
           echo 'El correo introducido ya está registrado';
