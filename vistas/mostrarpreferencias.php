@@ -13,6 +13,7 @@
   <body>
     <main>
       <div class="divWrapper">
+        <h1>Tus Preferencias:</h1>
         <?php
           include_once '../php/procesos.php';
           $procesos = new Procesos();

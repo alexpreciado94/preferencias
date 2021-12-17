@@ -16,4 +16,7 @@
     function codigoError(){
       return $this->conexion->errno;
     }
+    function cerrarConexion(){
+      $this->conexion->close();
+    }
   }

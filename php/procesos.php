@@ -18,6 +18,7 @@
       $resultado = $this->conexion->consultar($sql);
       session_start();
       $_SESSION['idUsuario'] = $this->recuperarId($datosRegistro)['idUsuario'];
+      $this->conexion->cerrarConexion();
       header('Location: vistas/preferencias.php');
     }
     function inicioSesion($datosInicio){
@@ -29,6 +30,7 @@
           session_start();
           $_SESSION['idUsuario'] = $fila['idUsuario'];
           $sw = true;
+          $this->conexion->cerrarConexion();
           header('Location: mostrarPreferencias.php');
         }
       }
@@ -44,6 +46,7 @@
         echo '<div><input type="checkbox" name="minijuegos[]" value="'.$fila['idJuego'].'" />
         <label for="minijuegos[]">'.$fila['nombreJuego'].'</label></div>'; //NO SE QUE PONER EN EL FOR
       }
+      $this->conexion->cerrarConexion();
     }
     function recuperarId($datosRegistro){
       $sql = 'select idUsuario from usuario where correo="'.$datosRegistro['email'].'"';
@@ -55,6 +58,7 @@
         $sql = 'insert into preferencia(idUsuario, idJuego) values ('.$_SESSION['idUsuario'].','.$preferencia.');';
         $resultado = $this->conexion->consultar($sql);
       }
+      $this->conexion->cerrarConexion();
       header('Location: ../index.php');
     }
     function mostrarPreferencias(){
@@ -65,7 +69,23 @@
         $fila = $this->conexion->extraerFila($resultado);
         echo '<p>'.$fila['nombreJuego'].'</p>';
       }
+      $this->conexion->cerrarConexion();
     }
+    /* SE SALE DE RANGO
+      function mostrarPreferencias(){
+        $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
+        where preferencia.idUsuario ='.$_SESSION['idUsuario'];
+        $resultado = $this->conexion->consultar($sql);
+        for ($i=0; $i<floor($resultado->num_rows/4); $i++){
+          $j = 0;
+          echo '<div class="wrapperPreferencias">';
+          while ($fila = $this->conexion->extraerFila($resultado) && $j<4){
+            echo '<p>'.$fila['nombreJuego'].'</p>';
+            $j++;
+          }
+          echo '</div>';
+        }
+      }*/
     function error($errno){
       switch ($errno) {
         case 0:
