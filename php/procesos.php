@@ -61,7 +61,7 @@
       $this->conexion->cerrarConexion();
       header('Location: ../index.php');
     }
-    function mostrarPreferencias(){
+    /*function mostrarPreferencias(){
       $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
       where preferencia.idUsuario ='.$_SESSION['idUsuario'];
       $resultado = $this->conexion->consultar($sql);
@@ -70,22 +70,24 @@
         echo '<p>'.$fila['nombreJuego'].'</p>';
       }
       $this->conexion->cerrarConexion();
-    }
-    /* SE SALE DE RANGO
-      function mostrarPreferencias(){
-        $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
-        where preferencia.idUsuario ='.$_SESSION['idUsuario'];
-        $resultado = $this->conexion->consultar($sql);
-        for ($i=0; $i<floor($resultado->num_rows/4); $i++){
-          $j = 0;
-          echo '<div class="wrapperPreferencias">';
-          while ($fila = $this->conexion->extraerFila($resultado) && $j<4){
-            echo '<p>'.$fila['nombreJuego'].'</p>';
-            $j++;
+    }*/
+
+    function mostrarPreferencias(){
+      $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
+      where preferencia.idUsuario ='.$_SESSION['idUsuario'];
+      $resultado = $this->conexion->consultar($sql);
+      for ($i=0; $i<round($resultado->num_rows/4, PHP_ROUND_HALF_UP); $i++){
+        $j = 0;
+        echo '<ul>';
+        while ($resultado->num_rows && $j<4){
+          if ($fila = $this->conexion->extraerFila($resultado)) {
+            echo '<li><p>'.$fila['nombreJuego'].'</p></li>';
           }
-          echo '</div>';
+          $j++;
         }
-      }*/
+        echo '</ul>';
+      }
+    }
     function error($errno){
       switch ($errno) {
         case 0:

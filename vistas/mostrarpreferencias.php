@@ -13,12 +13,16 @@
   <body>
     <main>
       <div class="divWrapper">
-        <h1>Tus Preferencias:</h1>
-        <?php
-          include_once '../php/procesos.php';
-          $procesos = new Procesos();
-          $procesos->mostrarPreferencias();
-        ?>
+        <div class="wrapperWrapper">
+          <h1>Tus Preferencias:</h1>
+            <div class="wrapperPreferencias">
+              <?php
+                include_once '../php/procesos.php';
+                $procesos = new Procesos();
+                $procesos->mostrarPreferencias();
+              ?>
+            </div>
+        </div>
       </div>
     </main>
   </body>
