@@ -39,6 +39,7 @@ form{
   justify-content: center;
   box-shadow: 3px 3px 7px black;
   border-radius: 5px;
+  overflow: hidden;
 }
 input[type="checkbox"]{
   width: auto;
@@ -59,4 +60,18 @@ input[type="submit"]{
 input[type="submit"]:hover{
 	background-color: gray;
 	border-color: gray;
+}
+.wrapperWrapper{
+  display: block;
+}
+.wrapperPreferencias{
+  display: flex;
+  justify-content: center;
+}
+.wrapperPreferencias ul{
+  display: inline-block;
+  padding: 0px 5%;
+}
+.wrapperPreferencias ul li{
+  margin-bottom: 0.2rem;
 }
