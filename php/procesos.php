@@ -1,5 +1,4 @@
 <?php
-//CERRAR CONEXIONES BD
   class Procesos{
     function __construct(){
       include_once 'conexion.php';
