@@ -13,7 +13,7 @@
         return $this->error($errno);
       }
       $sql = 'insert into usuario(nombreUsuario, correo, password) values
-      ("'.$datosRegistro['nombreUsuario'].'", "'.$datosRegistro['email'].'", "'.password_hash($datosRegistro['password']).'");';
+      ("'.$datosRegistro['nombreUsuario'].'", "'.$datosRegistro['email'].'", "'.password_hash($datosRegistro['password'], PASSWORD_DEFAULT, ['cost' => 4]).'");';
       $resultado = $this->operacionesdb->consultar($sql);
       session_start();
       $_SESSION['idUsuario'] = $this->recuperarId($datosRegistro)['idUsuario'];
@@ -21,15 +21,15 @@
       header('Location: vistas/preferencias.php');
     }
     function inicioSesion($datosInicio){
-      $sql = "select idUsuario, password from usuario where idUsuario= ?";
-      $stmt = $operacionesdb->conexion->prepare($sql);
+      $sql = "select idUsuario, password from usuario where correo= ?";
+      $stmt = $this->operacionesdb->conexion->prepare($sql);
       $stmt->bind_param('s', $datosInicio['email']);
       $stmt->execute();
       $resultado = $stmt->get_result();
       $sw = false;
       $fila = $this->operacionesdb->extraerFila($resultado);
-      if(isset($fila['correo']){
-        if(password_verify($datosInicio['password'], $fila['password']){
+      if(isset($fila['idUsuario'])){
+        if(password_verify($datosInicio['password'], $fila['password'])){
           session_start();
           $_SESSION['idUsuario'] = $fila['idUsuario'];
           $sw = true;
