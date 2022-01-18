@@ -1,35 +1,39 @@
 <?php
   class Procesos{
     function __construct(){
-      include_once 'conexion.php';
-      $this->conexion = new Conexion();
+      include_once 'operacionesdb.php';
+      $this->operacionesdb = new OperacionesDB();
     }
     function registro($datosRegistro){
       if(!str_contains($datosRegistro['email'], 'fundacionloyola.net')){
         return $this->error(0);
       }
-      $errno = $this->conexion->codigoError();
+      $errno = $this->operacionesdb->codigoError();
       if($errno){
         return $this->error($errno);
       }
       $sql = 'insert into usuario(nombreUsuario, correo, password) values
-      ("'.$datosRegistro['nombreUsuario'].'", "'.$datosRegistro['email'].'", "'.$datosRegistro['password'].'");';
-      $resultado = $this->conexion->consultar($sql);
+      ("'.$datosRegistro['nombreUsuario'].'", "'.$datosRegistro['email'].'", "'.password_hash($datosRegistro['password']).'");';
+      $resultado = $this->operacionesdb->consultar($sql);
       session_start();
       $_SESSION['idUsuario'] = $this->recuperarId($datosRegistro)['idUsuario'];
-      $this->conexion->cerrarConexion();
+      $this->operacionesdb->cerrarConexion();
       header('Location: vistas/preferencias.php');
     }
     function inicioSesion($datosInicio){
-      $sql = "select idUsuario, correo, password from usuario";
-      $resultado = $this->conexion->consultar($sql);
+      $sql = "select idUsuario, password from usuario where idUsuario= ?";
+      $stmt = $operacionesdb->conexion->prepare($sql);
+      $stmt->bind_param('s', $datosInicio['email']);
+      $stmt->execute();
+      $resultado = $stmt->get_result();
       $sw = false;
-      while($fila = $this->conexion->extraerFila($resultado)){
-        if($fila['correo']==$datosInicio['email'] && $fila['password']==$datosInicio['password']){
+      $fila = $this->operacionesdb->extraerFila($resultado);
+      if(isset($fila['correo']){
+        if(password_verify($datosInicio['password'], $fila['password']){
           session_start();
           $_SESSION['idUsuario'] = $fila['idUsuario'];
           $sw = true;
-          $this->conexion->cerrarConexion();
+          $this->operacionesdb->cerrarConexion();
           header('Location: mostrarPreferencias.php');
         }
       }
@@ -39,36 +43,37 @@
     }
     function listar(){
       $sql = 'select nombreJuego, idJuego from juego';
-      $resultado = $this->conexion->consultar($sql);
+      $resultado = $this->operacionesdb->consultar($sql);
       for ($i=0; $i<$resultado->num_rows; $i++){
-        $fila = $this->conexion->extraerFila($resultado);
+        $fila = $this->operacionesdb->extraerFila($resultado);
         echo '<div><input type="checkbox" name="minijuegos[]" value="'.$fila['idJuego'].'" />
         <label for="minijuegos[]">'.$fila['nombreJuego'].'</label></div>'; //NO SE QUE PONER EN EL FOR
       }
-      $this->conexion->cerrarConexion();
+      $this->operacionesdb->cerrarConexion();
     }
     function recuperarId($datosRegistro){
       $sql = 'select idUsuario from usuario where correo="'.$datosRegistro['email'].'"';
-      $resultado = $this->conexion->consultar($sql);
-      return $this->conexion->extraerFila($resultado);
+      $resultado = $this->operacionesdb->consultar($sql);
+      return $this->operacionesdb->extraerFila($resultado);
     }
     function anadir(){
       foreach ($_POST['minijuegos'] as $preferencia) {
         $sql = 'insert into preferencia(idUsuario, idJuego) values ('.$_SESSION['idUsuario'].','.$preferencia.');';
-        $resultado = $this->conexion->consultar($sql);
+        $resultado = $this->operacionesdb->consultar($sql);
       }
-      $this->conexion->cerrarConexion();
+      $this->operacionesdb->cerrarConexion();
       header('Location: ../index.php');
     }
+// ¡¡¡HACE FALTA BORRADO EN CASCADA EN LA TABLA PREFERENCIA!!!
     function mostrarPreferencias(){
       $sql = 'select nombreJuego from juego inner join preferencia on juego.idJuego = preferencia.idJuego
       where preferencia.idUsuario ='.$_SESSION['idUsuario'];
-      $resultado = $this->conexion->consultar($sql);
+      $resultado = $this->operacionesdb->consultar($sql);
       for ($i=0; $i<round($resultado->num_rows/4, PHP_ROUND_HALF_UP); $i++){
         $j = 0;
         echo '<ul>';
         while ($resultado->num_rows && $j<4){
-          if ($fila = $this->conexion->extraerFila($resultado)) {
+          if ($fila = $this->operacionesdb->extraerFila($resultado)) {
             echo '<li><p>'.$fila['nombreJuego'].'</p></li>';
           }
           $j++;
